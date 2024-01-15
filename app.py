@@ -646,9 +646,10 @@ def duration_curve_plot():
 start_time = time.time()
 streamlit_settings(title="Energy Plan Zero, Østmarka", icon="h")
 with st.sidebar:
-    c1, c2 = st.columns([1.5,1])
+    c1, c2 = st.columns([1,1])
+    st.header("Energianalyse Østmarka")
     with c1:
-        st.header("Energianalyse Østmarka")
+        st.image('src/img/av-logo-3.png', use_column_width = "auto")
     with c2:
         st.image('src/img/trondheim_kommune.png', use_column_width = "auto")
     my_bar = st.progress(0, text="Tegn polygon")
