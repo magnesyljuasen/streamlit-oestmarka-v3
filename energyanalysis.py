@@ -5,7 +5,6 @@ from oauthlib.oauth2 import BackendApplicationClient
 import time
 import random
 import swifter
-import streamlit as st
 from sklearn.linear_model import LinearRegression
 import warnings
 

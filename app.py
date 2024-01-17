@@ -11,7 +11,6 @@ from folium.plugins import MarkerCluster
 from streamlit_folium import st_folium
 from shapely.geometry import Point, Polygon
 from folium.plugins import Fullscreen
-from energyanalysis import EnergyAnalysis
 import time
 import base64
 
