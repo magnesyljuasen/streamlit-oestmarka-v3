@@ -52,7 +52,8 @@ ul.streamlit-expander {
     background-color: transparent;
     border-radius: 25px;
     border: 0.05px solid #005aa7;
-    padding: 5px;
+    padding: 10px;
+    margin: 10px;
 }
 
 hr {
@@ -123,11 +124,28 @@ div.stButton > button:first-child {
 
 [data-testid="column"] {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-    padding: 20px; /* Padding inside the card */
+    padding-top: 0px;
+    padding-right: 5px;
+    padding-bottom: 0px;
+    padding-left: 5px; /* Padding inside the card */
     /*max-height: 440px; */
     text-align: center;
-    min-height: 100px;
+    border-radius: 5px;
     overflow: hidden;
+}
+
+div.block-container {
+    padding-top: 0px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+[data-testid="stSidebar"] {
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
 }
 
 
