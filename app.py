@@ -16,11 +16,17 @@ import base64
 
 def streamlit_settings(title, icon):
     st.set_page_config(page_title=title, page_icon=icon, layout="wide")
+    st.markdown("""<style>[data-testid="collapsedControl"] svg {height: 3rem;width: 3rem;}</style>""", unsafe_allow_html=True)   
     st.markdown(
-        """<style>[data-testid="collapsedControl"] svg {height: 3rem;width: 3rem;}</style>""",
+        """
+    <style>
+    [data-testid="stMetricValue"] {
+        font-size: 25px;
+    }
+    </style>
+    """,
         unsafe_allow_html=True,
     )
-   
     with open("src/styles/main.css") as f:
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
@@ -589,16 +595,6 @@ def energy_effect_scenario_plot():
     st.caption(f"*{selected_scenario_name}*")
     HOURS = np.arange(0, 8760)
     fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=HOURS,
-            y=results[selected_scenario_name]["dict_arrays"]["grid"],
-            hoverinfo='skip',
-            stackgroup="one",
-            fill="tonexty",
-            line=dict(width=0, color=ELECTRIC_COLOR),
-            name=f'Fra strømnettet:<br>{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW'.replace(",", " ")
-            ))
     renewable_array = np.array(results[selected_scenario_name]["dict_arrays"]["total_delivered"]) - np.array(results[selected_scenario_name]["dict_arrays"]["grid"])
     fig.add_trace(
         go.Scatter(
@@ -609,6 +605,16 @@ def energy_effect_scenario_plot():
             fill="tonexty",
             line=dict(width=0, color=RENEWABLE_COLOR),
             name=f'Fornybar energi:<br>{int(round(np.sum(renewable_array),-3)):,} kWh/år<br>{int(round(np.max(renewable_array),-1)):,} kW'.replace(",", " ")
+            ))
+    fig.add_trace(
+        go.Scatter(
+            x=HOURS,
+            y=results[selected_scenario_name]["dict_arrays"]["grid"],
+            hoverinfo='skip',
+            stackgroup="one",
+            fill="tonexty",
+            line=dict(width=0, color=ELECTRIC_COLOR),
+            name=f'Fra strømnettet:<br>{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW'.replace(",", " ")
             ))
 
     fig.update_layout(
@@ -633,7 +639,7 @@ def energy_effect_scenario_plot():
             side='left', 
             showgrid=True, 
             tickformat=",.0f", 
-            range=[0, results[selected_scenario_name]["dict_max"]["total"] * 1.5]),
+            range=[0, results[selected_scenario_name]["dict_max"]["total"] * 1.3]),
         xaxis = dict(
             tickmode = 'array', 
             tickvals = [0, 24 * (31), 24 * (31 + 28), 24 * (31 + 28 + 31), 24 * (31 + 28 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31)], 
@@ -696,26 +702,25 @@ def energy_effect_comparison_plot():
     #st.markdown(download_link(df = df, filename = "data.csv"), unsafe_allow_html=True)
 
 def district_heating_counter(current_value):
-    # Define the gauge chart
     fig = go.Figure(go.Indicator(
         mode = "gauge+number",
         value = current_value,
         domain = {'x': [0, 1], 'y': [0, 1]},
         gauge = {
-            'axis': {'range': [0, 1750*2], 'tickwidth': 1, 'tickcolor': "darkblue"},
+            'axis': {'range': [0, 1750*2], 'tickwidth': 1, 'tickcolor': "#1d3c34"},
             'bar': {'color': "#1d3c34"},
             'bgcolor': "white",
             'borderwidth': 2,
-            'bordercolor': "gray",
+            'bordercolor': "#1d3c34",
             'steps': [
-                {'range': [0, 1750], 'color': '#F0F4E3'},
-                {'range': [1750, 1750*2], 'color': '#FF5733'}],
+                {'range': [0, 1750], 'color': '#F6F8F1'},
+                {'range': [1750, 1750*2], 'color': '#F0F4E3'}],
             'threshold': {
-                'line': {'color': "red", 'width': 4},
+                'line': {'color': "#1d3c34", 'width': 4},
                 'thickness': 1,
                 'value': 1750}}))
     fig.update_layout(
-        margin=dict(l=20, r=20, t=20, b=20),  # Set margins to zero
+        margin=dict(l=50, r=50, t=50, b=50),  # Set margins to zero
         height=300,  # Adjust the height of the plot
     )
     st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
@@ -761,13 +766,13 @@ BEFORE_COLOR = "black"
 RENEWABLE_COLOR = "green"
 AFTER_COLOR = "#5C5CFF"
 DHW_COLOR = "#b39200"
-THERMAL_COLOR = "#48a23f"
-ELECTRIC_COLOR = "blue"
-ELSPECIFIC_COLOR = "#3399ff"
-GRID_COLOR = "#7f7f7f"
+THERMAL_COLOR = "#1d3c34"
+ELECTRIC_COLOR = "#aeb9b6"
+ELSPECIFIC_COLOR = "#aeb9b6"
+GRID_COLOR = "#1d3c34"
 STAND_OUT_COLOR = "#48a23f"
 BASE_COLOR = "#1d3c34"
-TOTAL_COLOR = "#1d3c34"
+TOTAL_COLOR = "#627871"
 PRODUCED_HEAT_COLOR = "#1d3c34"
 PRODUCED_EL_COLOR = "lightblue"
 ###############
@@ -810,7 +815,7 @@ with COLUMN_2:
         st.write("""Utforsk ulike 
                 energiscenarier ved å velge ett alternativ fra venstremenyen. 
                 Dette kan inkludere energieffektiviseringstiltak som grunnvarme, fjernvarme, 
-                solceller, varmepumper, ppgradering av byginngsmasse samt kombinasjoner av disse.""")
+                solceller, varmepumper, oppgradering av byginngsmasse samt kombinasjoner av disse.""")
     with st.expander("📈 Visualiser resultater"):
         st.write("""Resultatene vises øyeblikkelig, og 
                 du kan utforske dem gjennom grafiske representasjoner.
