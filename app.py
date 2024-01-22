@@ -443,19 +443,20 @@ def energy_effect_plot():
     st.markdown(download_link(df = df, filename = "data.csv"), unsafe_allow_html=True)
 
 def energy_effect_delivered_plot():
+    st.caption("*Referansesituasjon*")
     HOURS = np.arange(0, 8760)
     fig = go.Figure()
-#    fig.add_trace(
-#        go.Scatter(
-#            x=HOURS,
-#            y=results[selected_scenario_name]["dict_arrays"]["total_delivered"],
-#            hoverinfo='skip',
-#            stackgroup="one",
-#            visible = 'legendonly',
-#            fill="tonexty",
-#            line=dict(width=0, color=TOTAL_COLOR),
-#            name=f'Strøm fra nettet:<br>{int(round(results[selected_scenario_name]["dict_sum"]["total_delivered"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["total_delivered"],-1)):,} kW'.replace(",", " ")
-#            ))
+    fig.add_trace(
+        go.Scatter(
+            x=HOURS,
+            y=results[selected_scenario_name]["dict_arrays"]["total_delivered"],
+            hoverinfo='skip',
+            stackgroup="one",
+            visible = 'legendonly',
+            fill="tonexty",
+            line=dict(width=0, color=TOTAL_COLOR),
+            name=f'Fra strømnettet (totalt):<br>{int(round(results[selected_scenario_name]["dict_sum"]["total_delivered"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["total_delivered"],-1)):,} kW'.replace(",", " ")
+            ))
     fig.add_trace(
         go.Scatter(
             x=HOURS,
@@ -464,7 +465,7 @@ def energy_effect_delivered_plot():
             stackgroup="one",
             fill="tonexty",
             line=dict(width=0, color=ELECTRIC_COLOR),
-            name=f'Elektrisk:<br>{int(round(results[selected_scenario_name]["dict_sum"]["electric"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["electric"],-1)):,} kW'.replace(",", " ")
+            name=f'Elspesifikt (fra strømnettet):<br>{int(round(results[selected_scenario_name]["dict_sum"]["electric"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["electric"],-1)):,} kW'.replace(",", " ")
             ))
     if results[selected_scenario_name]["dict_sum"]["produced_el"] > 1:
         fig.add_trace(
@@ -485,7 +486,7 @@ def energy_effect_delivered_plot():
             stackgroup="one",
             fill="tonexty",
             line=dict(width=0, color=THERMAL_COLOR),
-            name=f'Termisk:<br>{int(round(results[selected_scenario_name]["dict_sum"]["thermal"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["thermal"],-1)):,} kW'.replace(",", " ")
+            name=f'Termisk (fra strømnettet):<br>{int(round(results[selected_scenario_name]["dict_sum"]["thermal"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["thermal"],-1)):,} kW'.replace(",", " ")
             ))
     if results[selected_scenario_name]["dict_sum"]["produced_heat"] > 1:
         fig.add_trace(
@@ -529,7 +530,6 @@ def energy_effect_delivered_plot():
             showgrid=True)
         )
     st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
-    st.caption("*Referansesituasjon*")
     c1, c2 = st.columns(2)
     with c1:
         st.metric(label = "**Energi** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_sum"]["total_delivered"],-3)):,} kWh/år'.replace(",", " "), label_visibility='visible')
@@ -540,6 +540,7 @@ def energy_effect_delivered_plot():
         st.write("...")
     
 def energy_effect_scenario_plot():
+    st.caption(f"*{selected_scenario_name}*")
     HOURS = np.arange(0, 8760)
     fig = go.Figure()
     fig.add_trace(
@@ -550,7 +551,7 @@ def energy_effect_scenario_plot():
             stackgroup="one",
             fill="tonexty",
             line=dict(width=0, color=ELECTRIC_COLOR),
-            name=f'Strøm fra nettet:<br>{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW'.replace(",", " ")
+            name=f'Fra strømnettet:<br>{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år<br>{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW'.replace(",", " ")
             ))
     renewable_array = np.array(results[selected_scenario_name]["dict_arrays"]["total_delivered"]) - np.array(results[selected_scenario_name]["dict_arrays"]["grid"])
     fig.add_trace(
@@ -595,7 +596,6 @@ def energy_effect_scenario_plot():
             showgrid=True)
         )
     st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
-    st.caption(f"*{selected_scenario_name}*")
     c1, c2 = st.columns(2)
     energy_reduction = int(round(((results[selected_scenario_name]["dict_sum"]["total_delivered"] - results[selected_scenario_name]["dict_sum"]["grid"])/results[selected_scenario_name]["dict_sum"]["total_delivered"])*100,1))
     effect_reduction = int(round(((results[selected_scenario_name]["dict_max"]["total_delivered"] - results[selected_scenario_name]["dict_max"]["grid"])/results[selected_scenario_name]["dict_max"]["total_delivered"])*100,1))
@@ -647,7 +647,7 @@ def energy_effect_comparison_plot():
         yaxis_ticksuffix=" kWh/år",
         yaxis2_ticksuffix=" kW",
         separators="* .*",
-        height=150
+        height=300
         )
     st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
     #st.markdown(download_link(df = df, filename = "data.csv"), unsafe_allow_html=True)
@@ -663,7 +663,7 @@ def duration_curve_plot():
         data.append(trace)
     layout = go.Layout(
         margin=dict(b=0, t=0),
-        height=150, 
+        height=300, 
         xaxis=dict(title=None, showgrid=True), 
         yaxis=dict(title=None, showgrid=True), 
         separators="* .*",
@@ -719,8 +719,8 @@ PRODUCED_EL_COLOR = "lightblue"
 SCENARIO_NAMES = find_scenario_names("output")
 #SCENARIO_NAMES = ['Referansesituasjon', 'Fjernvarme for Ringve VGS', 'Høyblokker med bergvarme', 'Solceller på alle tak']
 selected_scenario_name = select_scenario()
-#df_position = read_position(f'output/{selected_scenario_name}')
-df_position = read_position(f'output/Referansesituasjon')
+df_position = read_position(f'output/{selected_scenario_name}')
+#df_position = read_position(f'output/Referansesituasjon')
 df_position = building_plan_filter(df_position)
 SCENARIO_COMPARISON = scenario_comparison()
 folium_map, gdf_buildings = create_map(df_position = df_position)
@@ -778,11 +778,14 @@ with COLUMN_2:
 my_bar.progress(int(i + (100 - i)/2), text = "Lager figurer...") 
 ######################################################################
 if SCENARIO_COMPARISON == True:
-    COLUMN_1, COLUMN_2 = st.columns([1.5, 1])
+    COLUMN_1, COLUMN_2 = st.columns([1, 3])
     with COLUMN_1:
-        energy_effect_comparison_plot()
+        st.caption("Scenariosammenligning")
+        st.write("Her vises en sammenligning av alle scenariene for det gjeldende utvalget.")
+        #energy_effect_comparison_plot()
     with COLUMN_2:
-        duration_curve_plot()
+        energy_effect_comparison_plot()
+        #duration_curve_plot()
     
 my_bar.progress(100, text="Fullført") 
 
