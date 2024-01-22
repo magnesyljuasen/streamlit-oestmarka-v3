@@ -107,12 +107,13 @@ def create_map(df_position):
     def add_building_to_marker_cluster(marker_cluster, scenario_name, df):
         for index, row in df.iterrows():
             popup_text, tooltip_text, icon = styling_function(row)
-            folium.Marker(
+            marker = folium.Marker(
                 [row["y"], row["x"]],
                 # popup = popup_text,
                 tooltip=tooltip_text,
                 icon=icon,
-            ).add_to(marker_cluster)
+            )
+            folium_map.add_child(marker)
     
     def add_geojson_to_map(
         file_path,
@@ -138,7 +139,7 @@ def create_map(df_position):
             name=layer_name,
             show=show,
         ).add_to(folium_map)
-
+    
     center_y = df_position["x"].mean()
     center_x = df_position["y"].mean()
     folium_map = folium.Map(
@@ -284,7 +285,7 @@ def read_hourly_data(object_ids, filepath):
 def select_scenario():
     with st.sidebar:
         option_list = SCENARIO_NAMES.copy()
-        #option_list.remove('Referansesituasjon')
+        option_list.remove('Referansesituasjon')
         scenario_name = st.radio(label='Velg scenario', options=option_list)
     return scenario_name
 
@@ -536,10 +537,12 @@ def energy_effect_delivered_plot():
     with c2:
         st.metric(label = "**Effekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["total_delivered"],-1)):,} kW'.replace(",", " "), label_visibility='visible')
     
+def download_data():
     with st.expander("Mer informasjon"):
         data = results[selected_scenario_name]["dict_months_sum"]
         df = pd.DataFrame(data)
         df["months"] = MONTHS
+        df = df.set_index('months')
         st.write("Tabellen under viser månedlige verdier for energi (kWh).")
         st.dataframe(
             data=df,
@@ -550,12 +553,35 @@ def energy_effect_delivered_plot():
                 "spaceheating" : st.column_config.NumberColumn("Romoppvarming (kWh)", format="%d"),
                 "elspecific" : st.column_config.NumberColumn("Elspesifikt (kWh)", format="%d"),
                 "grid" : st.column_config.NumberColumn("Levert fra strømnettet (kWh)", format="%d"),
-                "produced_heat" : st.column_config.NumberColumn("Levert varme (kWh)", format="%d"),
-                "produced_el" : st.column_config.NumberColumn("Levert strøm (kWh)", format="%d"),
+                "produced_heat" : st.column_config.NumberColumn("Lokalprodusert varme (kWh)", format="%d"),
+                "produced_el" : st.column_config.NumberColumn("Lokalprodusert strøm (kWh)", format="%d"),
                 "total" : st.column_config.NumberColumn("Totalt (kWh)", format="%d"),
                 "total_delivered" : st.column_config.NumberColumn("Levert totalt (kWh)", format="%d"),
                 "dhw" : st.column_config.NumberColumn("Tappevann (kWh)", format="%d"),
                 "electric" : st.column_config.NumberColumn("Elspesifikt behov - lokalprodusert strøm (kWh)", format="%d")
+            }, 
+            use_container_width=True)
+        #--
+        data = results[selected_scenario_name]["dict_months_max"]
+        df = pd.DataFrame(data)
+        df["months"] = MONTHS
+        df = df.set_index('months')
+        st.write("Tabellen under viser månedlige verdier for effekt (kW).")
+        st.dataframe(
+            data=df,
+            column_config={
+                "months" : "Måned",
+                "thermal" : st.column_config.NumberColumn("Romoppvarming + tappevann - varmeproduksjon (kW)", format="%d"),
+                "thermal_total" : st.column_config.NumberColumn("Romoppvarming + tappevann (kW)", format="%d"),
+                "spaceheating" : st.column_config.NumberColumn("Romoppvarming (kW)", format="%d"),
+                "elspecific" : st.column_config.NumberColumn("Elspesifikt (kW)", format="%d"),
+                "grid" : st.column_config.NumberColumn("Levert fra strømnettet (kW)", format="%d"),
+                "produced_heat" : st.column_config.NumberColumn("Lokalprodusert varme (kW)", format="%d"),
+                "produced_el" : st.column_config.NumberColumn("Lokalprodusert strøm (kW)", format="%d"),
+                "total" : st.column_config.NumberColumn("Totalt (kW)", format="%d"),
+                "total_delivered" : st.column_config.NumberColumn("Levert totalt (kW)", format="%d"),
+                "dhw" : st.column_config.NumberColumn("Tappevann (kW)", format="%d"),
+                "electric" : st.column_config.NumberColumn("Elspesifikt behov - lokalprodusert strøm (kW)", format="%d")
             }, 
             use_container_width=True)
     
@@ -623,9 +649,6 @@ def energy_effect_scenario_plot():
         st.metric(label = "**Energi** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år (-{energy_reduction:,}%)'.replace(",", " "), label_visibility='visible')
     with c2:
         st.metric(label = "**Effekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW (-{effect_reduction:,}%)'.replace(",", " "), label_visibility='visible')
-
-    with st.expander("Mer informasjon"):
-        st.write("...")
     
 def energy_effect_comparison_plot():
     st.markdown(f"<span style='color:{AFTER_COLOR}'>Fremtidig behov fra strømnettet for alle scenariene (kWh/år og kW)".replace(",", " "), unsafe_allow_html=True)
@@ -671,6 +694,31 @@ def energy_effect_comparison_plot():
         )
     st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
     #st.markdown(download_link(df = df, filename = "data.csv"), unsafe_allow_html=True)
+
+def district_heating_counter(current_value):
+    # Define the gauge chart
+    fig = go.Figure(go.Indicator(
+        mode = "gauge+number",
+        value = current_value,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        gauge = {
+            'axis': {'range': [0, 1750*2], 'tickwidth': 1, 'tickcolor': "darkblue"},
+            'bar': {'color': "#1d3c34"},
+            'bgcolor': "white",
+            'borderwidth': 2,
+            'bordercolor': "gray",
+            'steps': [
+                {'range': [0, 1750], 'color': '#F0F4E3'},
+                {'range': [1750, 1750*2], 'color': '#FF5733'}],
+            'threshold': {
+                'line': {'color': "red", 'width': 4},
+                'thickness': 1,
+                'value': 1750}}))
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=20, b=20),  # Set margins to zero
+        height=300,  # Adjust the height of the plot
+    )
+    st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
 
 def duration_curve_plot():
     st.markdown(f"<span style='color:{AFTER_COLOR}'>Fremtidig behov fra strømnettet for alle scenariene som varighetskurver".replace(",", " "), unsafe_allow_html=True)
@@ -748,13 +796,27 @@ with COLUMN_1:
     st_map = display_map(folium_map)
 with COLUMN_2:
     st.caption("Hvordan bruke Energy Plan Zero?")
-    st.write(
-        """Start med å tegne et polygon 
-        for å gjøre et utvalg av bygg. 
-        Da vises resultater for energi- og effekt 
-        for utvalget.
-        
-        """)
+    with st.expander("🖥️ Konfigurering", expanded=False):
+        st.write("""Vi har allerede hentet inn bygningsdata fra matrikkelen 
+                 for byggene i området samt hentet inn reelle data for fjernvarmen i området.
+                 Det er bygget opp 12 ulike scenarier med ulike variasjoner av 
+                 grunnvarme, fjernvarme, varmepumper, solceller og oppgradering av bygningsmassen.""")
+    with st.expander("✏️ Tegn ditt utvalg", expanded=True):
+        st.write("""Start med å bruke tegneverktøyet øverst til høyre i kartet 
+                for å markere et område ved å tegne et polygon 
+                rundt de bygningene du ønsker å analysere. 
+                Dette kan være et enkelt bygg eller flere bygninger samlet.""")
+    with st.expander("⚪ Velg scenario"):
+        st.write("""Utforsk ulike 
+                energiscenarier ved å velge ett alternativ fra venstremenyen. 
+                Dette kan inkludere energieffektiviseringstiltak som grunnvarme, fjernvarme, 
+                solceller, varmepumper, ppgradering av byginngsmasse samt kombinasjoner av disse.""")
+    with st.expander("📈 Visualiser resultater"):
+        st.write("""Resultatene vises øyeblikkelig, og 
+                du kan utforske dem gjennom grafiske representasjoner.
+                Se hvordan tiltakene påvirker bygningenes energi- og effektreduksjon, 
+                og identifiser de mest effektive tiltakene. Huk av for 
+                 sammenlign scenarier for å se en sammenstilling av alle scenariene innenfor utvalget.""")
     filtered_gdf = spatial_join(gdf_buildings)
 
 object_ids = filtered_gdf['objectid'].astype(str)
@@ -795,13 +857,28 @@ with COLUMN_1:
     energy_effect_delivered_plot()
 with COLUMN_2:
     energy_effect_scenario_plot()
+download_data()
 my_bar.progress(int(i + (100 - i)/2), text = "Lager figurer...") 
 ######################################################################
+COLUMN_1, COLUMN_2 = st.columns([1, 1])
+with COLUMN_1:
+    st.write("Eksisterende fjernvarmeleveranse (kW)")
+    produced_heat = results[selected_scenario_name]["dict_max"]["produced_heat"]
+    district_heating_counter(current_value = produced_heat)
+with COLUMN_2:
+    st.write("Fremtidig fjernvarmeleveranse (kW)")
+    renewable_array = np.array(results[selected_scenario_name]["dict_arrays"]["total_delivered"]) - np.array(results[selected_scenario_name]["dict_arrays"]["grid"])
+    district_heating_counter(current_value = produced_heat + np.max(renewable_array))
+######################################################################
 if SCENARIO_COMPARISON == True:
+    st.markdown("")
     COLUMN_1, COLUMN_2 = st.columns([1, 3])
     with COLUMN_1:
         st.caption("Scenariosammenligning")
-        st.write("Her vises en sammenligning av alle scenariene for det gjeldende utvalget.")
+        st.write("""
+            Sammenlign resultater fra ulike scenarioer ved å vise 
+            dem side om side. Identifiser hvilke scenarier som 
+            trenger minst strøm fra nettet (kWh/år og kW).""")
         #energy_effect_comparison_plot()
     with COLUMN_2:
         energy_effect_comparison_plot()
