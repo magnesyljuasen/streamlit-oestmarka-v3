@@ -537,7 +537,27 @@ def energy_effect_delivered_plot():
         st.metric(label = "**Effekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["total_delivered"],-1)):,} kW'.replace(",", " "), label_visibility='visible')
     
     with st.expander("Mer informasjon"):
-        st.write("...")
+        data = results[selected_scenario_name]["dict_months_sum"]
+        df = pd.DataFrame(data)
+        df["months"] = MONTHS
+        st.write("Tabellen under viser månedlige verdier for energi (kWh).")
+        st.dataframe(
+            data=df,
+            column_config={
+                "months" : "Måned",
+                "thermal" : st.column_config.NumberColumn("Romoppvarming + tappevann - varmeproduksjon (kWh)", format="%d"),
+                "thermal_total" : st.column_config.NumberColumn("Romoppvarming + tappevann (kWh)", format="%d"),
+                "spaceheating" : st.column_config.NumberColumn("Romoppvarming (kWh)", format="%d"),
+                "elspecific" : st.column_config.NumberColumn("Elspesifikt (kWh)", format="%d"),
+                "grid" : st.column_config.NumberColumn("Levert fra strømnettet (kWh)", format="%d"),
+                "produced_heat" : st.column_config.NumberColumn("Levert varme (kWh)", format="%d"),
+                "produced_el" : st.column_config.NumberColumn("Levert strøm (kWh)", format="%d"),
+                "total" : st.column_config.NumberColumn("Totalt (kWh)", format="%d"),
+                "total_delivered" : st.column_config.NumberColumn("Levert totalt (kWh)", format="%d"),
+                "dhw" : st.column_config.NumberColumn("Tappevann (kWh)", format="%d"),
+                "electric" : st.column_config.NumberColumn("Elspesifikt behov - lokalprodusert strøm (kWh)", format="%d")
+            }, 
+            use_container_width=True)
     
 def energy_effect_scenario_plot():
     st.caption(f"*{selected_scenario_name}*")
