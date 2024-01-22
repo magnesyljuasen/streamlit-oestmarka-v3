@@ -284,7 +284,7 @@ def read_hourly_data(object_ids, filepath):
 def select_scenario():
     with st.sidebar:
         option_list = SCENARIO_NAMES.copy()
-        option_list.remove('Referansesituasjon')
+        #option_list.remove('Referansesituasjon')
         scenario_name = st.radio(label='Velg scenario', options=option_list)
     return scenario_name
 

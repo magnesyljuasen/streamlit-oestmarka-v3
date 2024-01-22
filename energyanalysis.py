@@ -770,14 +770,14 @@ class EnergyAnalysis:
                     #st.write(tiltak, tiltak_percentage)
                     df = self.add_random_values(df = df, energy_id = energy_id, building_type = building_type, percentage = tiltak_percentage, column = tiltak)
                     #df = self.fill_reduction_values(df = df, energy_id = energy_id, building_type = building_type, percentage = tiltak_percentage, column = tiltak)
-        #--
+                    #--         
         df[self.HAS_EXISTING_DATA] = False
         for index, row in df.iterrows():
             address = str(row[self.HAS_ADDRESS])
             if address in self.address_keys:
                 df.at[index, self.HAS_EXISTING_DATA] = True
         #--
-        df.loc[df[self.BUILDING_STANDARD_UPGRADED] & (df[self.PROFET_BUILDINGSTANDARD] == "Eldre"), self.PROFET_BUILDINGSTANDARD] = 'TEK10/TEK17'
+        df.loc[df[self.BUILDING_STANDARD_UPGRADED] == True, self.PROFET_BUILDINGSTANDARD] = "TEK10/TEK17"
         return df
     
     def __default_simulation(self, df, energy_dicts, scenario_name):
@@ -817,10 +817,10 @@ class EnergyAnalysis:
         self.run_simulations(df)
 
 #test 
-#energy_analysis = EnergyAnalysis(
-#    building_table = "building_table_østmarka.xlsx",
-#    energy_area_id = "energiomraadeid",
-#    building_area_id = "bygningsomraadeid",
-#    scenario_file_name = "input/scenarier.xlsx",
-#    temperature_array_file_path = "input/utetemperatur.xlsx")
-#energy_analysis.main()
+energy_analysis = EnergyAnalysis(
+    building_table = "building_table_østmarka_v2.xlsx",
+    energy_area_id = "energiomraadeid",
+    building_area_id = "bygningsomraadeid",
+    scenario_file_name = "input/scenarier.xlsx",
+    temperature_array_file_path = "input/utetemperatur.xlsx")
+energy_analysis.main()
