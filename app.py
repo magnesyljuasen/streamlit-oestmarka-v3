@@ -541,7 +541,7 @@ def energy_effect_delivered_plot():
     with c1:
         st.metric(label = "**Energi** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_sum"]["total_delivered"],-3)):,} kWh/år'.replace(",", " "), label_visibility='visible')
     with c2:
-        st.metric(label = "**Effekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["total_delivered"],-1)):,} kW'.replace(",", " "), label_visibility='visible')
+        st.metric(label = "**Makseffekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["total_delivered"],-1)):,} kW'.replace(",", " "), label_visibility='visible')
     
 def download_data():
     with st.expander("Mer informasjon"):
@@ -654,7 +654,7 @@ def energy_effect_scenario_plot():
     with c1:
         st.metric(label = "**Energi** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år (-{energy_reduction:,}%)'.replace(",", " "), label_visibility='visible')
     with c2:
-        st.metric(label = "**Effekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW (-{effect_reduction:,}%)'.replace(",", " "), label_visibility='visible')
+        st.metric(label = "**Makseffekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW (-{effect_reduction:,}%)'.replace(",", " "), label_visibility='visible')
     
 def energy_effect_comparison_plot():
     st.markdown(f"<span style='color:{AFTER_COLOR}'>Fremtidig behov fra strømnettet for alle scenariene (kWh/år og kW)".replace(",", " "), unsafe_allow_html=True)
