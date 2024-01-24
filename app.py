@@ -679,21 +679,27 @@ def energy_effect_comparison_plot():
     df = df[df['scenario'] != 'Referansesituasjon']
     df = pd.concat([reference_row, df])
     df.reset_index(drop=True, inplace=True)
-    y_max_energy = np.max(df["energy"] * 1.1)
-    y_max_effect = np.max(df["effect"] * 1.1)
+    y_max_energy = np.max(df["energy"] * 1.5)
+    y_max_effect = np.max(df["effect"] * 1.5)
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=df["scenario"], y=df["energy"], marker=dict(color=AFTER_COLOR)))
-    fig.add_trace(go.Scatter(x=df["scenario"], y=df["effect"], yaxis='y2', mode='lines+markers', line=dict(width=1, color="black", dash = "dot"), marker=dict(color=AFTER_COLOR, symbol="diamond", line=dict(width=1, color = "black"))))
+    fig.add_trace(go.Bar(x=df["scenario"], y=df["energy"], name="Energi (kWh)", marker=dict(color=AFTER_COLOR)))
+    fig.add_trace(go.Scatter(x=df["scenario"], y=df["effect"], yaxis='y2', mode='lines+markers', name="Makseffekt (kW)", line=dict(width=1, color="black", dash = "dot"), marker=dict(color=AFTER_COLOR, symbol="diamond", line=dict(width=1, color = "black"))))
     fig.update_layout(
-        showlegend=False,
-        margin=dict(b=0, t=0),
-        yaxis=dict(title=None, side='left', showgrid=True, tickformat=",.0f", range=[0, y_max_energy]),
-        yaxis2=dict(title=None, side='right', overlaying='y', showgrid=True, range=[0, y_max_effect]),
+        showlegend=True,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        ),
+        margin=dict(b=50, t=50, l=50, r=50),
+        yaxis=dict(title="Energi (kWh)", side='left', showgrid=True, tickformat=",.0f", range=[0, y_max_energy]),
+        yaxis2=dict(title="Makseffekt (kW)", side='right', overlaying='y', showgrid=True, range=[0, y_max_effect]),
         xaxis=dict(title=None, showgrid=True, tickformat=",.0f"),
-        yaxis_ticksuffix=" kWh/år",
-        yaxis2_ticksuffix=" kW",
+        #yaxis_ticksuffix=" kWh/år",
+        #yaxis2_ticksuffix=" kW",
         separators="* .*",
-        height=300
+        height=400
         )
     st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
     #st.markdown(download_link(df = df, filename = "data.csv"), unsafe_allow_html=True)
@@ -898,16 +904,17 @@ st.info(f"""Fjernvarmen har i dag en maksimal kapasitet
 ######################################################################
 if SCENARIO_COMPARISON == True:
     st.markdown("")
-    COLUMN_1, COLUMN_2 = st.columns([1, 3])
-    with COLUMN_1:
-        st.caption("Scenariosammenligning")
-        st.write("""
-            Sammenlign resultater fra ulike scenarioer ved å vise 
-            dem side om side. Identifiser hvilke scenarier som 
-            trenger minst strøm fra nettet (kWh/år og kW).""")
-        #energy_effect_comparison_plot()
-    with COLUMN_2:
-        energy_effect_comparison_plot()
+#    COLUMN_1, COLUMN_2 = st.columns([1, 3])
+#    with COLUMN_1:
+#        st.caption("Scenariosammenligning")
+#        st.write("""
+#            Sammenlign resultater fra ulike scenarioer ved å vise 
+#            dem side om side. Identifiser hvilke scenarier som 
+#            trenger minst strøm fra nettet (kWh/år og kW).""")
+#        #energy_effect_comparison_plot()
+#    with COLUMN_2:
+    st.markdown("---")
+    energy_effect_comparison_plot()
         #duration_curve_plot()
     
 my_bar.progress(100, text="Fullført") 
