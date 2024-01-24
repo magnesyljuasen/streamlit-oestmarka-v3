@@ -804,12 +804,7 @@ with st.sidebar:
                  for byggene i området samt hentet inn reelle data for fjernvarmen i området.
                  Det er bygget opp 12 ulike scenarier med ulike variasjoner av 
                  grunnvarme, fjernvarme, varmepumper, solceller og oppgradering av bygningsmassen.""")
-    with st.expander(" 2 Tegn ditt utvalg", expanded=True):
-        st.write("""Start med å bruke tegneverktøyet øverst til høyre i kartet 
-                for å markere et område ved å tegne et polygon 
-                rundt de bygningene du ønsker å analysere. 
-                Dette kan være et enkelt bygg eller flere bygninger samlet.""")
-    with st.expander(" 3 Velg scenario"):
+    with st.expander(" 2 Velg scenario"):
         st.write("""Utforsk ulike 
                 energiscenarier ved å velge ett alternativ fra venstremenyen. 
                 Dette kan inkludere energieffektiviseringstiltak som grunnvarme, fjernvarme, 
@@ -821,6 +816,11 @@ with st.sidebar:
         else:
             df_position = read_position(f'output/Referansesituasjon')
         df_position = building_plan_filter(df_position)
+    with st.expander(" 3 Tegn ditt utvalg", expanded=True):
+        st.write("""Bruk tegneverktøyet øverst til høyre i kartet 
+                for å markere et område ved å tegne et polygon 
+                rundt de bygningene du ønsker å analysere. 
+                Dette kan være et enkelt bygg eller flere bygninger samlet.""")
     with st.expander(" 4 Visualiser resultater"):
         st.write("""Resultatene vises øyeblikkelig, og 
                 du kan utforske dem gjennom grafiske representasjoner.
