@@ -258,28 +258,26 @@ def spatial_join(gdf_buildings):
     return filtered_gdf
 
 def scenario_comparison():
-    with st.sidebar:
-        scenario_comparison = st.checkbox("Sammenligne scenarier?", value=False)
+    scenario_comparison = st.checkbox("Sammenligne scenarier?", value=False)
     return scenario_comparison
 
 def building_plan_filter(df_position):
-    with st.sidebar:
-        selected_buildings_option = st.radio(
-            "Velg bygningsmasse", 
-            options = [
-                "Eksisterende bygningsmasse", 
-                #"Planforslag (inkl. dagens bygg som skal bevares)", 
-                #"Planforslag (ekskl. helsebygg)", 
-                "Planforslag og områdene rundt Østmarka"
-                ]
-                )
-        selected_buildings_option_map = {
-            "Eksisterende bygningsmasse" : "E",
-            "Planforslag (inkl. dagens bygg som skal bevares)" : "P1",
-            "Planforslag (ekskl. helsebygg)" : "P2",
-            "Planforslag og områdene rundt Østmarka" : "P3"
-        }
-        building_area_id = selected_buildings_option_map[selected_buildings_option]
+    selected_buildings_option = st.radio(
+        "Velg bygningsmasse", 
+        options = [
+            "Eksisterende bygningsmasse", 
+            #"Planforslag (inkl. dagens bygg som skal bevares)", 
+            #"Planforslag (ekskl. helsebygg)", 
+            "Planforslag og områdene rundt Østmarka"
+            ]
+            )
+    selected_buildings_option_map = {
+        "Eksisterende bygningsmasse" : "E",
+        "Planforslag (inkl. dagens bygg som skal bevares)" : "P1",
+        "Planforslag (ekskl. helsebygg)" : "P2",
+        "Planforslag og områdene rundt Østmarka" : "P3"
+    }
+    building_area_id = selected_buildings_option_map[selected_buildings_option]
     df_position = df_position[df_position['bygningsomraadeid'] == building_area_id]
     return df_position
 
@@ -289,10 +287,9 @@ def read_hourly_data(object_ids, filepath):
     return df_hourly_data
 
 def select_scenario():
-    with st.sidebar:
-        option_list = SCENARIO_NAMES.copy()
-        option_list.remove('Referansesituasjon')
-        scenario_name = st.radio(label='Velg scenario', options=option_list)
+    option_list = SCENARIO_NAMES.copy()
+    option_list.remove('Referansesituasjon')
+    scenario_name = st.radio(label='Velg scenario', options=option_list)
     return scenario_name
 
 def get_dict_arrays(df_hourly_data):
@@ -450,7 +447,7 @@ def energy_effect_plot():
     st.markdown(download_link(df = df, filename = "data.csv"), unsafe_allow_html=True)
 
 def energy_effect_delivered_plot():
-    st.caption("*Referansesituasjon*")
+    st.subheader("**Referansesituasjon**")
     HOURS = np.arange(0, 8760)
     fig = go.Figure()
     fig.add_trace(
@@ -592,7 +589,7 @@ def download_data():
             use_container_width=True)
     
 def energy_effect_scenario_plot():
-    st.caption(f"*{selected_scenario_name}*")
+    st.subheader(f"**{selected_scenario_name}**")
     HOURS = np.arange(0, 8760)
     fig = go.Figure()
     renewable_array = np.array(results[selected_scenario_name]["dict_arrays"]["total_delivered"]) - np.array(results[selected_scenario_name]["dict_arrays"]["grid"])
@@ -652,9 +649,9 @@ def energy_effect_scenario_plot():
     energy_reduction = int(round(((results[selected_scenario_name]["dict_sum"]["total_delivered"] - results[selected_scenario_name]["dict_sum"]["grid"])/results[selected_scenario_name]["dict_sum"]["total_delivered"])*100,1))
     effect_reduction = int(round(((results[selected_scenario_name]["dict_max"]["total_delivered"] - results[selected_scenario_name]["dict_max"]["grid"])/results[selected_scenario_name]["dict_max"]["total_delivered"])*100,1))
     with c1:
-        st.metric(label = "**Energi** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år (-{energy_reduction:,}%)'.replace(",", " "), label_visibility='visible')
+        st.metric(label = "**Energi** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_sum"]["grid"],-3)):,} kWh/år'.replace(",", " "), delta = f"{energy_reduction:,}% reduksjon", label_visibility='visible')
     with c2:
-        st.metric(label = "**Makseffekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW (-{effect_reduction:,}%)'.replace(",", " "), label_visibility='visible')
+        st.metric(label = "**Makseffekt** fra strømnettet", value = f'{int(round(results[selected_scenario_name]["dict_max"]["grid"],-1)):,} kW'.replace(",", " "), delta = f"{effect_reduction:,}% reduksjon", label_visibility='visible')
     
 def energy_effect_comparison_plot():
     st.markdown(f"<span style='color:{AFTER_COLOR}'>Fremtidig behov fra strømnettet for alle scenariene (kWh/år og kW)".replace(",", " "), unsafe_allow_html=True)
@@ -724,7 +721,8 @@ def district_heating_counter(current_value):
         height=300,  # Adjust the height of the plot
     )
     st.plotly_chart(fig, use_container_width=True, config = {'displayModeBar': True, 'staticPlot': True})
-
+    
+        
 def duration_curve_plot():
     st.markdown(f"<span style='color:{AFTER_COLOR}'>Fremtidig behov fra strømnettet for alle scenariene som varighetskurver".replace(",", " "), unsafe_allow_html=True)
     keys = list(results.keys())
@@ -756,7 +754,9 @@ with st.sidebar:
     #with c1:
     #with c2:
     my_bar = st.progress(0, text="Tegn polygon")
-COLUMN_1, COLUMN_2 = st.columns([3, 1])
+    
+    
+#COLUMN_1, COLUMN_2 = st.columns([1, 3])
 ###############
 ###############
 MONTHS = ["jan", "feb", "mar", "apr", "mai", "jun", "jul", "aug", "sep", "okt", "nov", "des"]
@@ -764,7 +764,7 @@ SPACEHEATING_COLOR = "#ff9966"
 HISTORIC_COLOR = "#0000A3"
 BEFORE_COLOR = "black"
 RENEWABLE_COLOR = "green"
-AFTER_COLOR = "#5C5CFF"
+AFTER_COLOR = "#48a23f"
 DHW_COLOR = "#b39200"
 THERMAL_COLOR = "#1d3c34"
 ELECTRIC_COLOR = "#aeb9b6"
@@ -791,38 +791,46 @@ PRODUCED_EL_COLOR = "lightblue"
 ###############
 SCENARIO_NAMES = find_scenario_names("output")
 #SCENARIO_NAMES = ['Referansesituasjon', 'Fjernvarme for Ringve VGS', 'Høyblokker med bergvarme', 'Solceller på alle tak']
-selected_scenario_name = select_scenario()
-df_position = read_position(f'output/{selected_scenario_name}')
-#df_position = read_position(f'output/Referansesituasjon')
-df_position = building_plan_filter(df_position)
-SCENARIO_COMPARISON = scenario_comparison()
-folium_map, gdf_buildings = create_map(df_position = df_position)
-with COLUMN_1:
-    st_map = display_map(folium_map)
-with COLUMN_2:
+with st.sidebar:
     st.caption("Hvordan bruke Energy Plan Zero?")
-    with st.expander("🖥️ Konfigurering", expanded=False):
+    with st.expander(" 1 Konfigurering", expanded=False):
         st.write("""Vi har allerede hentet inn bygningsdata fra matrikkelen 
                  for byggene i området samt hentet inn reelle data for fjernvarmen i området.
                  Det er bygget opp 12 ulike scenarier med ulike variasjoner av 
                  grunnvarme, fjernvarme, varmepumper, solceller og oppgradering av bygningsmassen.""")
-    with st.expander("✏️ Tegn ditt utvalg", expanded=True):
+    with st.expander(" 2 Tegn ditt utvalg", expanded=True):
         st.write("""Start med å bruke tegneverktøyet øverst til høyre i kartet 
                 for å markere et område ved å tegne et polygon 
                 rundt de bygningene du ønsker å analysere. 
                 Dette kan være et enkelt bygg eller flere bygninger samlet.""")
-    with st.expander("⚪ Velg scenario"):
+    with st.expander(" 3 Velg scenario"):
         st.write("""Utforsk ulike 
                 energiscenarier ved å velge ett alternativ fra venstremenyen. 
                 Dette kan inkludere energieffektiviseringstiltak som grunnvarme, fjernvarme, 
                 solceller, varmepumper, oppgradering av byginngsmasse samt kombinasjoner av disse.""")
-    with st.expander("📈 Visualiser resultater"):
+        selected_scenario_name = select_scenario()
+        show_scenarios = st.checkbox("Vis scenario på kart", value = False)
+        if show_scenarios == True:
+            df_position = read_position(f'output/{selected_scenario_name}')
+        else:
+            df_position = read_position(f'output/Referansesituasjon')
+        df_position = building_plan_filter(df_position)
+    with st.expander(" 4 Visualiser resultater"):
         st.write("""Resultatene vises øyeblikkelig, og 
                 du kan utforske dem gjennom grafiske representasjoner.
                 Se hvordan tiltakene påvirker bygningenes energi- og effektreduksjon, 
                 og identifiser de mest effektive tiltakene. Huk av for 
                  sammenlign scenarier for å se en sammenstilling av alle scenariene innenfor utvalget.""")
-    filtered_gdf = spatial_join(gdf_buildings)
+        
+        SCENARIO_COMPARISON = scenario_comparison()
+
+#SCENARIO_COMPARISON = scenario_comparison()
+folium_map, gdf_buildings = create_map(df_position = df_position)
+st_map = display_map(folium_map)
+filtered_gdf = spatial_join(gdf_buildings)
+if len(filtered_gdf) == 0:
+    st.warning('Det er ingen bygg innenfor tegnet polygon. Prøv igjen.', icon="⚠️")
+    st.stop()
 
 object_ids = filtered_gdf['objectid'].astype(str)
 object_ids['ID'] = 'ID'
@@ -868,12 +876,25 @@ my_bar.progress(int(i + (100 - i)/2), text = "Lager figurer...")
 COLUMN_1, COLUMN_2 = st.columns([1, 1])
 with COLUMN_1:
     st.write("Eksisterende fjernvarmeleveranse (kW)")
-    produced_heat = results[selected_scenario_name]["dict_max"]["produced_heat"]
-    district_heating_counter(current_value = produced_heat)
+    produced_heat_today = int(results[selected_scenario_name]["dict_max"]["produced_heat"])
+    district_heating_counter(current_value = produced_heat_today)
 with COLUMN_2:
     st.write("Fremtidig fjernvarmeleveranse (kW)")
     renewable_array = np.array(results[selected_scenario_name]["dict_arrays"]["total_delivered"]) - np.array(results[selected_scenario_name]["dict_arrays"]["grid"])
-    district_heating_counter(current_value = produced_heat + np.max(renewable_array))
+    produced_heat_future = int(produced_heat_today + np.max(renewable_array))
+    district_heating_counter(current_value = produced_heat_future)
+
+if produced_heat_future > 1750:
+    word = "Dette betyr at dagens fjernvarmenett **overbelastes**."
+else:
+    word = f"Dette betyr at det er tilstrekkelig kapasitet i dagens fjernvarmenett ({int((produced_heat_future/1750) * 100)}% av kapasiteten er brukt opp."
+st.info(f"""Fjernvarmen har i dag en maksimal kapasitet 
+        på 1750 kW inn til området. I dag leveres det 
+        fjernvarme med en effekt på {produced_heat_today} kW til byggene i utvalget. 
+        Dette tilsvarer {int((produced_heat_today/1750) * 100)}% av kapasiteten.
+        Med en fremtidig bruk av fjernvarmen som i scenariet *{selected_scenario_name.lower()}* 
+        vil fjernvarmeleveransen inn til området være {produced_heat_future} kW. {word}
+        """)
 ######################################################################
 if SCENARIO_COMPARISON == True:
     st.markdown("")
