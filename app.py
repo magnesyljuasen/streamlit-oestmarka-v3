@@ -887,13 +887,13 @@ with COLUMN_2:
 if produced_heat_future > 1750:
     word = "Dette betyr at dagens fjernvarmenett **overbelastes**."
 else:
-    word = f"Dette betyr at det er tilstrekkelig kapasitet i dagens fjernvarmenett ({int((produced_heat_future/1750) * 100)}% av kapasiteten er brukt opp."
+    word = f"Dette betyr at det er tilstrekkelig kapasitet i dagens fjernvarmenett ({int((produced_heat_future/1750) * 100)}% av kapasiteten er brukt opp)."
 st.info(f"""Fjernvarmen har i dag en maksimal kapasitet 
         på 1750 kW inn til området. I dag leveres det 
-        fjernvarme med en effekt på {produced_heat_today} kW til byggene i utvalget. 
+        fjernvarme med en effekt på {int(produced_heat_today)} kW til byggene i utvalget. 
         Dette tilsvarer {int((produced_heat_today/1750) * 100)}% av kapasiteten.
         Med en fremtidig bruk av fjernvarmen som i scenariet *{selected_scenario_name.lower()}* 
-        vil fjernvarmeleveransen inn til området være {produced_heat_future} kW. {word}
+        vil fjernvarmeleveransen inn til området være {int(produced_heat_future)} kW. {word}
         """)
 ######################################################################
 if SCENARIO_COMPARISON == True:
