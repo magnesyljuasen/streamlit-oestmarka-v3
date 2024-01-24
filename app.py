@@ -816,7 +816,7 @@ with st.sidebar:
         else:
             df_position = read_position(f'output/Referansesituasjon')
         df_position = building_plan_filter(df_position)
-    with st.expander(" 3 Tegn ditt utvalg", expanded=True):
+    with st.expander(" 3 Tegn ditt utvalg", expanded=False):
         st.write("""Bruk tegneverktøyet øverst til høyre i kartet 
                 for å markere et område ved å tegne et polygon 
                 rundt de bygningene du ønsker å analysere. 
